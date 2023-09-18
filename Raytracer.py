@@ -7,7 +7,7 @@ from lights import *
 from material import *
 
 width = 512
-height = 512
+height = 756
 
 pygame.init()
 
@@ -17,16 +17,16 @@ screen.set_alpha(None)
 rt = Raytracer(screen)
 rt.rtClearColor(0.5,0.5,0.5)
 #Materiales
-brick = Material(diffuse=(1, 0.4, 0.4), spec = 8)
-grass = Material(diffuse=(0.4, 1, 0.4), spec = 32)
-water = Material(diffuse=(0.4, 0.4, 1), spec = 256)
+snow = Material(diffuse=(1, 1, 1), spec = 200, Ks = 0.1)
 #Figuras
-rt.scene.append( Sphere(position=(-2,0,-5), radius=0.5, material = brick))
-rt.scene.append( Sphere(position=(0,0,-5), radius=0.5, material = grass))
-rt.scene.append( Sphere(position=(2,0,-5), radius=0.5, material = water))
+rt.scene.append( Sphere(position=(0,-1.5,-5), radius=1.2, material = snow))
+rt.scene.append( Sphere(position=(0,0.4,-5), radius=0.9, material = snow))
+rt.scene.append( Sphere(position=(0,1.7,-5), radius=0.7, material = snow))
 #Luces
 rt.lights.append( AmbientLight(intensity=0.1))
 rt.lights.append( DirectionalLight(direction=(-1,-1,-1), intensity=0.7))
+rt.lights.append( DirectionalLight(direction=(0,-2,-1), intensity= 0.5))
+#rt.lights.append( PointLight(point=(2.5,0,-5),intensity=1, color=(1,0,1)))
 
 
 isRunning = True

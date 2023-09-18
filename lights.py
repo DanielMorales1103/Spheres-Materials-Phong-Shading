@@ -39,6 +39,7 @@ class DirectionalLight(Light):
 
         intensity = np.dot(intercept.normal, dir) * self.intensity
         intensity = max(0, min(1,intensity))
+        intensity *= 1 - intercept.obj.material.Ks
 
         diffuseColor = [(i * intensity) for i in self.color]
 
@@ -53,9 +54,53 @@ class DirectionalLight(Light):
         viewDir = viewDir / np.linalg.norm(viewDir)
 
         specIntensity = max(0, np.dot(viewDir, reflect)) ** intercept.obj.material.spec
+        specIntensity *= intercept.obj.material.Ks
         specIntensity *= self.intensity
 
         specColor = [(i * specIntensity) for i in self.color]
 
         return specColor
         
+class PointLight(Light):
+    def __init__(self, point = (0,0,0), intensity=1, color=(1, 1, 1)):
+        self.point = point
+        super().__init__(intensity, color, "Point")
+
+    def getDiffuseColor(self, intercept):
+        dir = np.subtract(self.point, intercept.point)
+        R = np.linalg.norm(dir)
+        dir = dir / R
+
+        intensity = np.dot(intercept.normal, dir) * self.intensity
+        intensity *= 1 - intercept.obj.material.Ks
+
+        if R != 0:
+            intensity /= R ** 2
+
+        intensity = max(0, min(1,intensity))
+
+        return [(i * intensity) for i in self.color]
+    
+    def getSpecularColor(self, intercept, viewPos):
+    
+        dir = np.subtract(self.point, intercept.point)
+        R = np.linalg.norm(dir)
+        dir = dir / R
+
+        reflect = reflectVector(intercept.normal, dir)
+
+        viewDir = np.subtract(viewPos, intercept.point)
+        viewDir = viewDir / np.linalg.norm(viewDir)
+
+        specIntensity = max(0, np.dot(viewDir, reflect)) ** intercept.obj.material.spec
+        specIntensity *= intercept.obj.material.Ks
+        specIntensity *= self.intensity
+
+        if R != 0:
+            specIntensity /= R ** 2
+        specIntensity = max(0, min(1,specIntensity))
+
+
+        specColor = [(i * specIntensity) for i in self.color]
+
+        return specColor
