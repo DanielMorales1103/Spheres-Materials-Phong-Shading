@@ -3,7 +3,7 @@ import random
 import pygame
 from material import *
 import libreria as lb
-
+import numpy as np  
 MAX_RECURSION_DEPTH = 3
 
 class Raytracer(object):
@@ -102,6 +102,7 @@ class Raytracer(object):
         reflectColor = [0,0,0]
         diffuseColor = [0,0,0]
         specularColor = [0,0,0]
+        refractColor = [0,0,0]
         finalColor = [0,0,0]
         
         if material.matType == OPAQUE:
@@ -143,7 +144,44 @@ class Raytracer(object):
                     if shadowIntersect == None:
                         specularColor = [(specularColor[i]+light.getSpecularColor(intercept, self.camPosition)[i]) for i in range(3)]
         
-        lightColor = [(ambientColor[i]+diffuseColor[i]+specularColor[i]+reflectColor[i]) for i in range(3)]  
+        elif material.matType == TRANSPARENT:
+            outside = lb.dot_product(rayDirection, intercept.normal) < 0
+            bias = [i * 0.001 for i in intercept.normal] #intercept.normal * 0.001
+
+            negrayDirection = [i * -1 for i in rayDirection]
+            reflect = lb.reflect_vector(intercept.normal, negrayDirection)
+            reflectOrig = lb.add_vectors(intercept.point, bias) if outside else lb.subtract_vectors(intercept.point, bias)
+            reflectIntercept = self.rtCastRay(reflectOrig, reflect, None, recursion + 1)
+            reflectColor = self.rtRayColor(reflectIntercept, reflect, recursion + 1)
+
+            for light in self.lights:
+                if light.lightType != "Ambient":
+                    lightDir = None
+                    if light.lightType == "Directional":
+                        lightDir = [(i*-1) for i in light.direction]
+                    elif light.lightType == "Point":
+                        lightDir = lb.subtract_vectors(light.point, intercept.point)
+                        lightDir = lb.normalize_vector(lightDir)
+                        
+                    shadowIntersect = self.rtCastRay(intercept.point, lightDir, intercept.obj)
+                    
+                    if shadowIntersect == None:
+                        specularColor = [(specularColor[i]+light.getSpecularColor(intercept, self.camPosition)[i]) for i in range(3)]
+
+
+            if not lb.totalInternalreflection(intercept.normal, rayDirection, 1.0, material.ior):
+                refract = lb.refract_vector(intercept.normal, rayDirection, 1.0, material.ior)
+                refractOrig = lb.subtract_vectors(intercept.point, bias) if outside else lb.add_vectors(intercept.point, bias)
+                refractIntercept = self.rtCastRay(refractOrig, refract, None, recursion + 1)
+                refractColor = self.rtRayColor(refractIntercept, refract, recursion + 1)
+
+                Kr, Kt = lb.fresnel(intercept.normal, rayDirection, 1.0, material.ior)
+
+                reflectColor = lb.multiply_vector_scalar(reflectColor, Kr)
+                refractColor = lb.multiply_vector_scalar(refractColor, Kt)
+
+
+        lightColor = [(ambientColor[i]+diffuseColor[i]+specularColor[i]+reflectColor[i]+refractColor[i]) for i in range(3)]  
         
         finalColor = [min(1,surfaceColor[i]*lightColor[i])for i in range(3)]
         return finalColor

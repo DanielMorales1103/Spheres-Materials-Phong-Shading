@@ -6,8 +6,8 @@ from figuras import *
 from lights import *
 from material import *
 
-width = 256
-height = 256
+width = 512
+height = 512
 
 pygame.init()
 
@@ -15,10 +15,10 @@ screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF | pygame.HWAC
 screen.set_alpha(None)
 
 rt = Raytracer(screen)
-rt.envMap = pygame.image.load("night.jpg")
+rt.envMap = pygame.image.load("images/trees.jpg")
 rt.rtClearColor(0.27,0.36,0.52)
 
-flowTexture = pygame.image.load("flow.jpg")
+flowTexture = pygame.image.load("images/flow.jpg")
 
 brick = Material(diffuse=(1,0.4,0.4), spec = 8,  Ks = 0.01)
 grass = Material(diffuse=(0.4,1,0.4), spec = 32,  Ks = 0.1)
@@ -29,9 +29,15 @@ blueMirror = Material(diffuse=(0.4,0.4,0.9), spec = 32, Ks = 0.15, matType = REF
 colorFlow = Material(texture = flowTexture)
 reflectFlow = Material(texture = flowTexture, spec = 64, Ks = 0.1, matType= REFLECTIVE)
 
-rt.scene.append(Sphere(position=(-2,0,-7), radius = 1.5, material = reflectFlow))
-rt.scene.append(Sphere(position=(2,0,-7), radius = 2, material = colorFlow))
-rt.scene.append(Sphere(position=(0,-1,-5), radius = 0.5, material = mirror))
+glass = Material(diffuse=(0.9,0.9,0.9), spec = 64, Ks = 0.15, ior = 1.5, matType = TRANSPARENT)
+diamond = Material(diffuse=(0.9,0.9,0.9), spec = 64, Ks = 0.2, ior = 2.417, matType = TRANSPARENT)
+
+# rt.scene.append(Sphere(position=(-2,0,-7), radius = 1.5, material = reflectFlow))
+# rt.scene.append(Sphere(position=(2,0,-7), radius = 2, material = colorFlow))
+# rt.scene.append(Sphere(position=(0,-1,-5), radius = 0.5, material = mirror))
+rt.scene.append(Sphere(position=(-1,0,-5), radius = 1, material = glass))
+rt.scene.append(Sphere(position=(1,0,-5), radius = 0.7, material = diamond))
+rt.scene.append(Sphere(position=(0,1,-8), radius = 1, material = brick))
 
 
 #Luces
