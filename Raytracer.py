@@ -15,30 +15,29 @@ screen = pygame.display.set_mode((width, height), pygame.DOUBLEBUF | pygame.HWAC
 screen.set_alpha(None)
 
 rt = Raytracer(screen)
-rt.envMap = pygame.image.load("images/trees.jpg")
+rt.envMap = pygame.image.load("images/treesMap.jpg")
 rt.rtClearColor(0.27,0.36,0.52)
 
-flowTexture = pygame.image.load("images/flow.jpg")
+flowTexture = pygame.image.load("images/trees.jpg")
 
-brick = Material(diffuse=(1,0.4,0.4), spec = 8,  Ks = 0.01)
-grass = Material(diffuse=(0.4,1,0.4), spec = 32,  Ks = 0.1)
-water = Material(diffuse=(0.4,0.4,1), spec = 256, Ks = 0.2)
+brick = Material(diffuse=(1,0.4,0.4), spec = 8,  Ks = 0.01, matType = OPAQUE)
+colorFlow = Material(texture = flowTexture, matType = OPAQUE)
 
 mirror = Material(diffuse=(0.9,0.9,0.9), spec = 64, Ks = 0.2, matType = REFLECTIVE)
 blueMirror = Material(diffuse=(0.4,0.4,0.9), spec = 32, Ks = 0.15, matType = REFLECTIVE)
-colorFlow = Material(texture = flowTexture)
-reflectFlow = Material(texture = flowTexture, spec = 64, Ks = 0.1, matType= REFLECTIVE)
 
 glass = Material(diffuse=(0.9,0.9,0.9), spec = 64, Ks = 0.15, ior = 1.5, matType = TRANSPARENT)
 diamond = Material(diffuse=(0.9,0.9,0.9), spec = 64, Ks = 0.2, ior = 2.417, matType = TRANSPARENT)
 
-# rt.scene.append(Sphere(position=(-2,0,-7), radius = 1.5, material = reflectFlow))
-# rt.scene.append(Sphere(position=(2,0,-7), radius = 2, material = colorFlow))
-# rt.scene.append(Sphere(position=(0,-1,-5), radius = 0.5, material = mirror))
-rt.scene.append(Sphere(position=(-1,0,-5), radius = 1, material = glass))
-rt.scene.append(Sphere(position=(1,0,-5), radius = 0.7, material = diamond))
-rt.scene.append(Sphere(position=(0,1,-8), radius = 1, material = brick))
 
+rt.scene.append(Sphere(position=(-2,1.5,-5), radius = 0.6, material = brick))
+rt.scene.append(Sphere(position=(-2,-1.5,-5), radius = 0.6, material = colorFlow))
+
+rt.scene.append(Sphere(position=(0,1.5,-5), radius = 0.6, material = mirror))
+rt.scene.append(Sphere(position=(0,-1.5,-5), radius = 0.6, material = blueMirror))
+
+rt.scene.append(Sphere(position=(2,1.5,-5), radius = 0.6, material = glass))
+rt.scene.append(Sphere(position=(2,-1.5,-5), radius = 0.6, material = diamond))
 
 #Luces
 rt.lights.append(AmbientLight(intensity=0.1))
