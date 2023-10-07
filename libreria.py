@@ -9,7 +9,10 @@ def add_vectors(v1, v2):
 # Define una función para calcular la norma de un vector.
 def vector_norm(v):
     return math.sqrt(sum([v[i] ** 2 for i in range(3)]))
-
+#Regresa vector normalizado
+def normalize_vector(v):
+    length = vector_norm(v)
+    return [v[i] / length for i in range(3)]
 # Define una función para calcular el producto escalar de dos vectores.
 def dot_product(v1, v2):
     return sum([v1[i] * v2[i] for i in range(3)])
@@ -18,9 +21,7 @@ def dot_product(v1, v2):
 def add_vector_scaled(v1, scalar, v2):
     return [v1[i] + scalar * v2[i] for i in range(3)]
 
-def normalize_vector(v):
-    length = vector_norm(v)
-    return [v[i] / length for i in range(3)]
+
 
 def multiply_vector_scalar(v, scalar):
     return [scalar * v[i] for i in range(3)]

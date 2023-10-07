@@ -1,7 +1,7 @@
 
 from math import tan, pi, atan2, acos, sqrt
 import libreria as lb
-
+import numpy as np
 class Intercept(object):
     def __init__(self, distance, point, normal, obj, texcoords):
         self.distance = distance
@@ -53,3 +53,57 @@ class Sphere(Shape):
                          normal= normal,
                          texcoords= (u,v),
                          obj= self)
+    
+
+class Plane(Shape):
+    def __init__(self, position, normal, material):
+        self.normal = lb.normalize_vector(normal)
+        # self.normal = normal/np.linalg.norm(normal)
+        super().__init__(position, material)
+    
+    def ray_intersect(self, orig, dir):
+        denom = lb.dot_product(dir, self.normal) 
+        # denom = np.dot(dir, self.normal)
+        
+        if abs(denom) <= 0.0001:
+            return None
+        
+        num = lb.dot_product(lb.subtract_vectors(self.position, orig), self.normal)
+        # num = np.dot( np.subtract(self.position, orig), self.normal)
+        t = num / denom
+
+        if t < 0:
+            return None
+
+        P = lb.add_vector_scaled(orig, t, dir)
+        # P = np.add(orig, t * np.array(dir))
+        return Intercept(distance= t,
+                         point= P,
+                         normal= self.normal,
+                         texcoords= None,
+                         obj= self)
+        
+class Disk(Plane):
+    def __init__(self, position, normal, radius, material):
+        self.radius = radius
+        super().__init__(position, normal, material)
+    
+    def ray_intersect(self, orig, dir):
+        planeIntersect = super().ray_intersect(orig, dir)
+        
+        if planeIntersect is None:
+            return None
+        
+        # contactDistance = np.subtract(planeIntersect.point, self.position)
+        # contactDistance = np.linalg.norm(contactDistance)
+        contactDistance = lb.subtract_vectors(planeIntersect.point, self.position)
+        contactDistance = lb.vector_norm(contactDistance)
+        
+        if contactDistance > self.radius:
+            return None
+        
+        return Intercept(distance = planeIntersect.distance,
+                         point = planeIntersect.point,
+                         normal = self.normal,
+                         texcoords= None,
+                         obj = self)
