@@ -6,8 +6,8 @@ from figuras import *
 from lights import *
 from material import *
 
-width = 256
-height = 256
+width = 512
+height = 512
 
 pygame.init()
 screen = pygame.display.set_mode((width,height), pygame.DOUBLEBUF | pygame.HWACCEL | pygame.HWSURFACE | pygame.SCALED)
@@ -16,13 +16,19 @@ screen = pygame.display.set_mode((width,height), pygame.DOUBLEBUF | pygame.HWACC
 screen.set_alpha(None)
 
 rt = Raytracer(screen)
-rt.envMap = pygame.image.load("images/fondo.jpg")
+# rt.envMap = pygame.image.load("images/fondo.jpg")
 rt.rtClearColor(0.27,0.36,0.52)
 
 flowTexture = pygame.image.load("images/trees.jpg")
+boxTexture = pygame.image.load("images/box2.jpg")
+
+box = Material(texture=boxTexture)
 
 brick = Material(diffuse=(1,0.4,0.4), spec = 8,  Ks = 0.01, matType = OPAQUE)
+brickBack = Material(diffuse=(0.6, 0.2, 0.2), spec = 8,  Ks = 0.01, matType = OPAQUE)
 colorFlow = Material(texture = flowTexture, matType = OPAQUE)
+ceiling_color = Material(diffuse=(0.7, 0.7, 0.7), spec=8, Ks=0.01, matType=OPAQUE)
+floor_color = Material(diffuse=(0.5, 0.5, 0.5), spec=8, Ks=0.01, matType=OPAQUE)
 
 mirror = Material(diffuse=(0.9,0.9,0.9), spec = 64, Ks = 0.2, matType = REFLECTIVE)
 blueMirror = Material(diffuse=(0.4,0.4,0.9), spec = 32, Ks = 0.15, matType = REFLECTIVE)
@@ -31,23 +37,27 @@ glass = Material(diffuse=(0.9,0.9,0.9), spec = 64, Ks = 0.15, ior = 1.5, matType
 diamond = Material(diffuse=(0.9,0.9,0.9), spec = 64, Ks = 0.2, ior = 2.417, matType = TRANSPARENT)
 
 
-# rt.scene.append(Sphere(position=(-2,1.5,-5), radius = 0.6, material = brick))
-# rt.scene.append(Sphere(position=(-2,-1.5,-5), radius = 0.6, material = colorFlow))
+#planos (cuartos)
+# Pared izquierda
+rt.scene.append(Plane(position=(-5, 0, -5), normal=(1, 0, 0), material=brick))
+# # # Pared derecha
+rt.scene.append(Plane(position=(5, 0, 0), normal=(-1, 0, 0), material=brick))
+# # # Techo
+rt.scene.append(Plane(position=(0, 5, 0), normal=(0, -1, 0), material=ceiling_color))
+# # # # Piso
+rt.scene.append(Plane(position=(0, -5, 0), normal=(0, 1, 0), material=floor_color))
+# # Pared frontal (frente al fondo)
+rt.scene.append(Plane(position=(width/2,height/2,-20), normal=(0,0,1), material=brickBack))
 
-# rt.scene.append(Sphere(position=(0,1.5,-5), radius = 0.6, material = mirror))
-# rt.scene.append(Sphere(position=(0,-1.5,-5), radius = 0.6, material = blueMirror))
+#Cubos
+rt.scene.append( AABB(position=(-2,-1,-5), size=(1,1,1), material=box))
+rt.scene.append( AABB(position=(2,1,-5), size=(1,1,1), material=blueMirror))
 
-# rt.scene.append(Sphere(position=(2,1.5,-5), radius = 0.6, material = glass))
-# rt.scene.append(Sphere(position=(2,-1.5,-5), radius = 0.6, material = diamond))
-
-rt.scene.append(Sphere(position=(0,0.5,-5), radius = 0.6, material = blueMirror))
-rt.scene.append(Disk(position=(0,-1,-5), normal = (0,1,0), radius = 1.5, material = mirror))
-rt.scene.append(Plane(position=(0,-5,0), normal=(0,1,0), material=brick))
+#disco
+rt.scene.append( Disk(position=(0,-1,-3), normal=(0,1,0), radius=0.5, material=mirror))
 
 #Luces
-rt.lights.append(AmbientLight(intensity=0.1))
-rt.lights.append(DirectionalLight(direction=(-1,-1,-1), intensity=0.9))
-
+rt.lights.append(AmbientLight(intensity=0.5))
 rt.rtClear()
 rt.rtRender()
 

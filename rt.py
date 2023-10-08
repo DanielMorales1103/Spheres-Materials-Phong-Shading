@@ -91,10 +91,10 @@ class Raytracer(object):
         surfaceColor = material.diffuse
         
         if material.texture and intercept.texcoords:
-            tx = intercept.texcoords[0]*material.texture.get_width()
-            ty = intercept.texcoords[1]*material.texture.get_height()
+            tx = intercept.texcoords[0]*material.texture.get_width() - 1
+            ty = intercept.texcoords[1]*material.texture.get_height() - 1
             
-            texColor = material.texture.get_at((int(tx), int(ty)))
+            texColor = material.texture.get_at((int(tx), int(ty))) 
             texColor = [i/255 for i in texColor]
             surfaceColor = [surfaceColor[i]*texColor[i] for i in range(3)]
         
@@ -176,9 +176,17 @@ class Raytracer(object):
                 refractColor = self.rtRayColor(refractIntercept, refract, recursion + 1)
 
                 Kr, Kt = lb.fresnel(intercept.normal, rayDirection, 1.0, material.ior)
-
+                
                 reflectColor = lb.multiply_vector_scalar(reflectColor, Kr)
                 refractColor = lb.multiply_vector_scalar(refractColor, Kt)
+                # if reflectColor is not None:
+                #     reflectColor = lb.multiply_vector_scalar(reflectColor, Kr)
+                # else:
+                #     reflectColor =[0,0,0]
+                # if refractColor is not None:
+                #     refractColor = lb.multiply_vector_scalar(refractColor, Kt)
+                # else:
+                #     refractColor = [0,0,0]
 
 
         lightColor = [(ambientColor[i]+diffuseColor[i]+specularColor[i]+reflectColor[i]+refractColor[i]) for i in range(3)]  

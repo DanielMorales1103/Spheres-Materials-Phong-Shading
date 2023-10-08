@@ -12,6 +12,8 @@ def vector_norm(v):
 #Regresa vector normalizado
 def normalize_vector(v):
     length = vector_norm(v)
+    if length < 1e-8:  
+        return [0, 0, 0]
     return [v[i] / length for i in range(3)]
 # Define una función para calcular el producto escalar de dos vectores.
 def dot_product(v1, v2):
