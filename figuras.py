@@ -182,4 +182,41 @@ class AABB(Shape):
                          obj = self)
 
 
+class Triangle(Shape):
+    def __init__(self, vertices, material):
+        # `vertices` es una lista de tres puntos en el espacio que representan los vértices del triángulo
+        self.vertices = vertices
+        # Calcula la normal del triángulo
+        self.normal = lb.normalize_vector(lb.cross_product(lb.subtract_vectors(vertices[1], vertices[0]), lb.subtract_vectors(vertices[2], vertices[0])))
+        super().__init__(position=None, material=material)
 
+    def ray_intersect(self, orig, dir):
+        edge1 = lb.subtract_vectors(self.vertices[1], self.vertices[0])
+        edge2 = lb.subtract_vectors(self.vertices[2], self.vertices[0])
+
+        h = lb.cross_product(dir, edge2)
+        a = lb.dot_product(edge1, h)
+
+        if a > -0.0001 and a < 0.0001:
+            return None  # El rayo es paralelo al triángulo
+
+        f = 1 / a
+        s = lb.subtract_vectors(orig, self.vertices[0])
+        u = f * lb.dot_product(s, h)
+
+        if u < 0 or u > 1:
+            return None
+
+        q = lb.cross_product(s, edge1)
+        v = f * lb.dot_product(dir, q)
+
+        if v < 0 or u + v > 1:
+            return None
+
+        t = f * lb.dot_product(edge2, q)
+
+        if t > 0.0001:  # Asegurarse de que el punto de intersección esté delante del rayo
+            point = lb.add_vector_scaled(orig, t, dir)
+            return Intercept(distance=t, point=point, normal=self.normal, texcoords=None, obj=self)
+
+        return None  # El punto de intersección está detrás del rayo

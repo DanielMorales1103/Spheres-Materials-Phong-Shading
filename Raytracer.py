@@ -6,8 +6,8 @@ from figuras import *
 from lights import *
 from material import *
 
-width = 512
-height = 512
+width = 256
+height = 256
 
 pygame.init()
 screen = pygame.display.set_mode((width,height), pygame.DOUBLEBUF | pygame.HWACCEL | pygame.HWSURFACE | pygame.SCALED)
@@ -39,24 +39,26 @@ diamond = Material(diffuse=(0.9,0.9,0.9), spec = 64, Ks = 0.2, ior = 2.417, matT
 
 #planos (cuartos)
 # Pared izquierda
-rt.scene.append(Plane(position=(-5, 0, -5), normal=(1, 0, 0), material=brick))
+# rt.scene.append(Plane(position=(-5, 0, -5), normal=(1, 0, 0), material=brick))
 # # # Pared derecha
-rt.scene.append(Plane(position=(5, 0, 0), normal=(-1, 0, 0), material=brick))
+# rt.scene.append(Plane(position=(5, 0, 0), normal=(-1, 0, 0), material=brick))
 # # # Techo
-rt.scene.append(Plane(position=(0, 5, 0), normal=(0, -1, 0), material=ceiling_color))
+# rt.scene.append(Plane(position=(0, 5, 0), normal=(0, -1, 0), material=ceiling_color))
 # # # # Piso
-rt.scene.append(Plane(position=(0, -5, 0), normal=(0, 1, 0), material=floor_color))
+# rt.scene.append(Plane(position=(0, -5, 0), normal=(0, 1, 0), material=floor_color))
 # # Pared frontal (frente al fondo)
-rt.scene.append(Plane(position=(width/2,height/2,-20), normal=(0,0,1), material=brickBack))
+# rt.scene.append(Plane(position=(width/2,height/2,-20), normal=(0,0,1), material=brickBack))
 
 #Cubos
-rt.scene.append( AABB(position=(-2,-1,-5), size=(1,1,1), material=box))
-rt.scene.append( AABB(position=(2,1,-5), size=(1,1,1), material=blueMirror))
-
+# rt.scene.append( AABB(position=(-2,-1,-5), size=(1,1,1), material=box))
+# rt.scene.append( AABB(position=(2,1,-5), size=(1,1,1), material=blueMirror))
+rt.scene.append (Triangle(vertices=[(-1, -1, -5), (1, -1, -5), (0, 2, -5)], material=brick))
+rt.scene.append (Triangle(vertices=[(1, -1, -5), (0, 2, -5),(2, 2, -10),], material=brick))
 #disco
-rt.scene.append( Disk(position=(0,-1,-3), normal=(0,1,0), radius=0.5, material=mirror))
+# rt.scene.append( Disk(position=(0,-1,-3), normal=(0,1,0), radius=0.5, material=mirror))
 
 #Luces
+rt.lights.append(DirectionalLight(direction=(0,1,0)))
 rt.lights.append(AmbientLight(intensity=0.5))
 rt.rtClear()
 rt.rtRender()

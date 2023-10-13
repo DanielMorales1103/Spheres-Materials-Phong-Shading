@@ -89,3 +89,12 @@ def fresnel(normal, incident, n1, n2):
     Kr = (F1 + F2) / 2
     Kt = 1 - Kr
     return Kr, Kt
+
+
+def cross_product(u, v):
+    result = [
+        u[1] * v[2] - u[2] * v[1],
+        u[2] * v[0] - u[0] * v[2],
+        u[0] * v[1] - u[1] * v[0]
+    ]
+    return result
