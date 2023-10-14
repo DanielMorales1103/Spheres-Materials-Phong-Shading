@@ -83,7 +83,7 @@ class Raytracer(object):
                 
                 envColor = self.envMap.get_at((int(x),int(y)))
                 
-                return [envColor[i]/255 for i in range(3)]
+                return [i/255 for i in envColor]
             else:
                 return None
         
@@ -125,8 +125,8 @@ class Raytracer(object):
                         specularColor = [(specularColor[i]+light.getSpecularColor(intercept, self.camPosition)[i]) for i in range(3)]
         
         elif material.matType == REFLECTIVE:
-            negrayDirection = [i * -1 for i in rayDirection]
-            reflect = lb.reflect_vector(intercept.normal, negrayDirection)
+            rayDirection = [i * -1 for i in rayDirection]
+            reflect = lb.reflect_vector(intercept.normal, rayDirection)
             reflectIntercept = self.rtCastRay(intercept.point, reflect, intercept.obj, recursion + 1)
             reflectColor = self.rtRayColor(reflectIntercept, reflect, recursion + 1)
             
@@ -146,7 +146,7 @@ class Raytracer(object):
         
         elif material.matType == TRANSPARENT:
             outside = lb.dot_product(rayDirection, intercept.normal) < 0
-            bias = lb.multiply_vector_scalar(intercept.normal, 0.001)# [i * 0.001 for i in intercept.normal] #intercept.normal * 0.001
+            bias = [i * 0.001 for i in intercept.normal] #intercept.normal * 0.001
 
             negrayDirection = [i * -1 for i in rayDirection]
             reflect = lb.reflect_vector(intercept.normal, negrayDirection)
@@ -217,6 +217,3 @@ class Raytracer(object):
                 if rayColor != None: 
                     self.rtPoint(x,y,rayColor)
                     pygame.display.flip()
-
-     
-
