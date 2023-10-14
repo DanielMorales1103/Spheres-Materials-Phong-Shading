@@ -54,6 +54,7 @@ diamond = Material(diffuse=(0.9,0.9,0.9), spec = 64, Ks = 0.2, ior = 2.417, matT
 # rt.scene.append( AABB(position=(2,1,-5), size=(1,1,1), material=blueMirror))
 rt.scene.append (Triangle(vertices=[(-1, -1, -5), (1, -1, -5), (0, 2, -5)], material=brick))
 rt.scene.append (Triangle(vertices=[(1, -1, -5), (0, 2, -5),(2, 2, -10),], material=brick))
+rt.scene.append (Triangle(vertices=[(-2, 2, -5), (0, 2, -5),(-3, -3, -5),], material=brick))
 #disco
 # rt.scene.append( Disk(position=(0,-1,-3), normal=(0,1,0), radius=0.5, material=mirror))
 
