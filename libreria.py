@@ -8,13 +8,21 @@ def add_vectors(v1, v2):
 
 # Define una función para calcular la norma de un vector.
 def vector_norm(v):
-    return math.sqrt(sum([v[i] ** 2 for i in range(3)]))
+    suma_cuadrados = sum(componente ** 2 for componente in v)
+    norma = suma_cuadrados ** 0.5
+    return norma
+    # return math.sqrt(sum([v[i] ** 2 for i in range(3)]))
+
 #Regresa vector normalizado
 def normalize_vector(v):
     length = vector_norm(v)
     if length < 1e-8:  
-        return [0, 0, 0]
-    return [v[i] / length for i in range(3)]
+        raise ValueError("No se puede normalizar un vector nulo.")
+    
+    vectorNormalizado = [comp/length for comp in v]
+    # [v[i] / length for i in range(3)]
+    return tuple(vectorNormalizado)
+
 # Define una función para calcular el producto escalar de dos vectores.
 def dot_product(v1, v2):
     return sum([v1[i] * v2[i] for i in range(3)])
@@ -31,9 +39,14 @@ def multiply_vector_scalar(v, scalar):
 
 
 def reflect_vector(normal, direction):
-    dot_product_result = dot_product(normal, direction)
-    reflect = [2 * dot_product_result * normal[i] for i in range(3)]
-    reflect = [reflect[i] - direction[i] for i in range(3)]
+    reflect = 2*dot_product(normal,direction)
+    reflect = multiply_vector_scalar(normal,reflect)
+    reflect = subtract_vectors(reflect, direction)
+    reflect = normalize_vector(reflect)
+
+    # dot_product_result = dot_product(normal, direction)
+    # reflect = [2 * dot_product_result * normal[i] for i in range(3)]
+    # reflect = [reflect[i] - direction[i] for i in range(3)]
     return reflect
 
 def refract_vector(normal, incident, n1, n2):
@@ -47,10 +60,13 @@ def refract_vector(normal, incident, n1, n2):
     
     n = n1 / n2
 
-    escalar = (1 - n**2 * (1 - c1**2)) ** 0.5
-    v1 = multiply_vector_scalar(add_vector_scaled(incident, c1, normal), n) 
-    v2 =  multiply_vector_scalar(normal, escalar)
-    T = subtract_vectors(v1, v2)
+    # escalar = (1 - n**2 * (1 - c1**2)) ** 0.5
+    # v1 = multiply_vector_scalar(add_vector_scaled(incident, c1, normal), n) 
+    # v2 =  multiply_vector_scalar(normal, escalar)
+    # T = subtract_vectors(v1, v2)
+
+    # T = subtract_vectors(mt.multiply_scalar_array(n,(mt.add_arrays(incident,mt.multiply_scalar_array(c1,normal)))),mt.multiply_scalar_array((1-n**2*(1-c1**2))**0.5,normal))
+    T = subtract_vectors(multiply_vector_scalar(add_vectors(incident,multiply_vector_scalar(normal,c1)),n), multiply_vector_scalar(normal,(1-n**2*(1-c1**2))**0.5 ) )
     T =  normalize_vector(T)
     return T
 
@@ -61,7 +77,7 @@ def totalInternalreflection(incident, normal, n1, n2):
     if c1 < 0:
         c1 = -c1
     else:
-        normal = [i * -1 for i in normal]
+        # normal = [i * -1 for i in normal]
         n1, n2 = n2, n1
 
     if n1 < n2:
