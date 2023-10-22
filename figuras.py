@@ -220,3 +220,51 @@ class Triangle(Shape):
             return Intercept(distance=t, point=point, normal=self.normal, texcoords=None, obj=self)
 
         return None  # El punto de intersección está detrás del rayo
+
+class Cylinder(Shape):
+    def __init__(self, position, height, radius, material, direction=(0, 1, 0)):
+        self.height = height
+        self.radius = radius
+        self.direction = lb.normalize_vector(direction)
+        self.base1 = Disk(position, direction, radius, material)
+        self.base2 = Disk(lb.add_vectors(position, [direction[i] * height for i in range(3)]), direction, radius, material)
+        super().__init__(position, material)
+
+    def ray_intersect(self, orig, dir):
+        min_distance = float('inf')
+        closest_intersect = None
+
+        for base in [self.base1, self.base2]:
+            intersect = base.ray_intersect(orig, dir)
+            if intersect is not None and intersect.distance < min_distance:
+                min_distance = intersect.distance
+                closest_intersect = intersect
+
+        ao = lb.subtract_vectors(orig, self.position)
+        delta = lb.dot_product(dir, self.direction)
+        a = lb.dot_product(dir, dir) - delta ** 2
+        b = 2 * (lb.dot_product(dir, ao) - delta * lb.dot_product(ao, self.direction))
+        c = lb.dot_product(ao, ao) - lb.dot_product(ao, self.direction) ** 2 - self.radius ** 2
+        discriminant = b ** 2 - 4 * a * c
+
+        if discriminant > 0:
+            t0 = (-b - sqrt(discriminant)) / (2 * a)
+            t1 = (-b + sqrt(discriminant)) / (2 * a)
+            t = min(t0, t1)
+
+            if t > 0 and t < min_distance:
+                P = lb.add_vector_scaled(orig, t, dir)
+                normal = lb.subtract_vectors(P, self.position)
+                normal = lb.subtract_vectors(normal, [self.direction[i] * lb.dot_product(normal, self.direction) for i in range(3)])
+                normal_length = lb.vector_norm(normal)
+                normal = [normal[i] / normal_length for i in range(3)]
+
+                height_intersect = lb.dot_product(lb.subtract_vectors(P, self.position), self.direction)
+                if 0 <= height_intersect <= self.height:
+                    return Intercept(distance=t, 
+                                     point=P, 
+                                     normal=normal, 
+                                     texcoords=None, 
+                                     obj=self)
+
+        return closest_intersect

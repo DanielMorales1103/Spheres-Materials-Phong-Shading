@@ -14,7 +14,7 @@ class Raytracer(object):
         self.scene = []
         self.lights = []
 
-        self.camPosition = [0,0,0]
+        self.camPosition = [0,1,0]
         self.rtViewPort(0, 0, self.width, self.height )
 
         self.rtProyection()
